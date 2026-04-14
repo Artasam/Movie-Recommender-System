@@ -2,9 +2,17 @@
 
 A sophisticated content-based movie recommendation system that suggests movies similar to your favorites. Built with **Python** and **Streamlit**, this application leverages machine learning techniques to provide high-quality recommendations along with movie posters fetched in real-time.
 
-![Movie Recommender System](https://img.shields.io/badge/Python-3.8%2B-blue)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=streamlit)](https://movie-recommender-system-ak.streamlit.app/)
+
+![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.22%2B-red)
 ![Machine Learning](https://img.shields.io/badge/ML-Content--Based-green)
+
+---
+
+## 🔗 Live Demo
+
+You can try out the application live here: **[https://movie-recommender-system-ak.streamlit.app/](https://movie-recommender-system-ak.streamlit.app/)**
 
 ---
 
