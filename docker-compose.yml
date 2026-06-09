@@ -8,25 +8,6 @@
 # ══════════════════════════════════════════════════════════════════
 
 services:
-  # ── Frontend (Nginx + React SPA) ─────────────────────────────
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        - VITE_API_BASE_URL=/api
-    ports:
-      - "80:80"
-    depends_on:
-      backend:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
 
   # ── Backend (FastAPI + Gunicorn) ─────────────────────────────
   backend:
@@ -37,7 +18,7 @@ services:
       - "8000:8000"
     environment:
       - TMDB_API_KEY=${TMDB_API_KEY:-}
-      - CORS_ORIGINS=["http://localhost","http://localhost:80","http://localhost:5173"]
+      - CORS_ORIGINS=["*"]
       - DATA_DIR=/data
       - DEBUG=false
     restart: unless-stopped
