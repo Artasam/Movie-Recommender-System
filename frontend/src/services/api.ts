@@ -14,7 +14,13 @@ import type {
   PosterResponse,
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
+let API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '';
+
+// Prevent Mixed Content errors: if frontend is HTTPS but backend is HTTP,
+// force relative URLs to leverage the Vercel proxy rewrite.
+if (API_BASE_URL.startsWith('http://') && typeof window !== 'undefined' && window.location.protocol === 'https:') {
+  API_BASE_URL = '';
+}
 
 /** Pre-configured Axios instance with base URL and timeout. */
 const api = axios.create({
