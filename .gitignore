@@ -160,3 +160,32 @@ cython_debug/
 # Project specific files
 # Data files
 *.csv
+
+# ── Node.js / Frontend ──────────────────────────────────────────
+node_modules/
+dist/
+.npm
+*.tsbuildinfo
+*.local
+
+# ── Frontend environment files ───────────────────────────────────
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+
+# ── Backend environment files ────────────────────────────────────
+backend/.env
+
+# ── Docker ───────────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ── OS Files ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Large binary files (use Git LFS if needed) ──────────────────
+# similarity.pkl
+
+# ── Gemini / IDE ─────────────────────────────────────────────────
+.gemini/

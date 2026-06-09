@@ -1,67 +1,356 @@
-# 🎬 Movie Recommender System
-A sophisticated content-based movie recommendation system that suggests movies similar to your favorites. Built with **Python** and **Streamlit**, this application leverages machine learning techniques to provide high-quality recommendations along with movie posters fetched in real-time.
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=streamlit)](https://movie-recommender-system-ak.streamlit.app/)
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.22%2B-red)
-![Machine Learning](https://img.shields.io/badge/ML-Content--Based-green)
+# 🎬 CineMatch — AI Movie Recommender
+
+> Discover your next favorite movie with AI-powered content-based recommendations from 4,800+ titles.
+
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+
 ---
-## 🔗 Live Demo
-You can try out the application live here: **[https://movie-recommender-system-ak.streamlit.app/](https://movie-recommender-system-ak.streamlit.app/)**
+
+## 📋 Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Quick Start (Local)](#quick-start-local)
+- [Environment Variables](#environment-variables)
+- [API Documentation](#api-documentation)
+- [Docker Setup](#docker-setup)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
+
 ---
-## 🌟 Features
-- **Personalized Recommendations**: Get suggestions based on movie genres, keywords, cast, and crew.
-- **Dynamic Poster Fetching**: Integrated with [The Movie Database (TMDB) API](https://www.themoviedb.org/documentation/api) to display high-quality posters.
-- **Customizable Output**: Choose how many recommendations you want to see (from 1 to N).
-- **Responsive Layout**: Clean and intuitive UI that displays recommendations in a grid format.
-## 🛠️ Tech Stack
-- **Frontend**: [Streamlit](https://streamlit.io/)
-- **Data Analysis**: [Pandas](https://pandas.pydata.org/), [NumPy](https://numpy.org/)
-- **Machine Learning**: [Scikit-learn](https://scikit-learn.org/) (Cosine Similarity)
-- **API Connectivity**: [Requests](https://requests.readthedocs.io/)
-- **Data Persistence**: [Pickle](https://docs.python.org/3/library/pickle.html)
-## 🚀 Getting Started
-### Prerequisites
-Ensure you have Python installed (3.8 or higher is recommended).
-### Installation
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Artasam/Movie-Recommender-System.git
-   cd Movie-Recommender-System
-   ```
-2. **Create a virtual environment** (optional but recommended):
-   ```bash
-   python -m venv venv
-   # On Windows:
-   .\venv\Scripts\activate
-   # On macOS/Linux:
-   source venv/bin/activate
-   ```
-3. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-### 📦 Data Files
-The system relies on pre-processed data stored in pickle files:
-- `movies.pkl`: Contains the processed movie database.
-- `similarity.pkl`: Contains the cosine similarity matrix (pre-calculated for performance).
-*Note: If these files are missing, you may need to run the `Movie recomendation system.ipynb` notebook to regenerate them from the raw `movies.csv` and `credits.csv` files.*
-## 🖥️ Usage
-To start the application, run the following command in your terminal:
-```bash
-streamlit run movierec.py
+
+## Overview
+
+CineMatch is a full-stack movie recommendation system that uses **content-based filtering** with **cosine similarity** to suggest movies similar to ones you love. The ML pipeline processes movie metadata (genres, keywords, cast, crew, and plot overview) into TF-IDF vectors and computes a 4,806 × 4,806 similarity matrix for instant recommendations.
+
+**How it works:**
+1. Movie tags (genres, keywords, overview, cast, crew) are combined and stemmed
+2. Count Vectorization creates numerical vectors from the text
+3. Cosine similarity measures the "distance" between all movie pairs
+4. When you select a movie, the top-N most similar movies are returned instantly
+
+---
+
+## Features
+
+- 🔍 **Instant Search** — Debounced autocomplete search across 4,806 movie titles
+- 🎯 **AI Recommendations** — Content-based filtering using cosine similarity
+- 🖼️ **Movie Posters** — Real-time poster fetching from TMDB API
+- 🌙 **Dark/Light Mode** — System-aware theme with manual toggle
+- 📱 **Fully Responsive** — Mobile-first design, 320px → 1920px
+- ♿ **Accessible** — WCAG 2.1 AA compliant, keyboard navigation, ARIA labels
+- ⚡ **Fast** — Code-split routes, lazy-loaded images, pre-computed similarity matrix
+- 🐳 **Dockerized** — One-command deployment with Docker Compose
+- 📖 **API Docs** — Interactive Swagger/ReDoc at `/docs` and `/redoc`
+
+---
+
+## Tech Stack
+
+### Frontend
+| Technology | Purpose |
+|-----------|---------|
+| React 18 + TypeScript | UI framework with strict type safety |
+| Vite 6 | Build tool and dev server |
+| Vanilla CSS | Custom design system with CSS variables |
+| React Router v6 | Client-side routing |
+| TanStack Query v5 | Server state management and caching |
+| Zustand | Client state (theme) |
+| Axios | HTTP client |
+| Lucide React | Icon library |
+| React Hot Toast | Notification system |
+
+### Backend
+| Technology | Purpose |
+|-----------|---------|
+| Python 3.13 | Runtime |
+| FastAPI | Async web framework |
+| Pydantic v2 | Request/response validation |
+| pandas + NumPy | Data manipulation |
+| scikit-learn | ML pipeline (cosine similarity) |
+| httpx | Async HTTP client (TMDB API) |
+| Uvicorn + Gunicorn | ASGI server |
+
+### Infrastructure
+| Technology | Purpose |
+|-----------|---------|
+| Docker + Docker Compose | Containerization |
+| Nginx | Frontend serving + API reverse proxy |
+| AWS (S3, CloudFront, EC2) | Cloud deployment |
+| GitHub Actions | CI/CD pipelines |
+
+---
+
+## Project Structure
+
 ```
-Once the server starts, open your browser and navigate to the local URL (usually `http://localhost:8501`).
-1. Select a movie from the dropdown menu.
-2. Enter the number of recommendations you desire.
-3. Click on **"Give Recommendation"**.
-## 📊 How it Works
-1. **TF-IDF/Count Vectorization**: The system processes movie tags (genres, keywords, overview, etc.) into numerical vectors.
-2. **Cosine Similarity**: It calculates the mathematical "distance" (cosine angle) between movies to find the most similar ones.
-3. **API Integration**: Once a similar movie is identified, its `movie_id` is used to fetch the latest poster URL from TMDB.
+Movie-Recommender-System/
+├── frontend/                    # React + Vite + TypeScript
+│   ├── src/
+│   │   ├── components/          # Reusable UI components
+│   │   ├── pages/               # Route-level pages
+│   │   ├── services/api.ts      # Centralized API layer
+│   │   ├── store/               # Zustand theme store
+│   │   ├── styles/              # CSS design system
+│   │   ├── types/               # TypeScript interfaces
+│   │   ├── hooks/               # Custom React hooks
+│   │   ├── App.tsx              # Root component + routing
+│   │   └── main.tsx             # Entry point
+│   ├── Dockerfile               # Multi-stage build (Node → Nginx)
+│   └── nginx.conf               # SPA routing + API proxy
+│
+├── backend/                     # FastAPI
+│   ├── app/
+│   │   ├── api/v1/endpoints/    # Route handlers
+│   │   ├── core/config.py       # Pydantic BaseSettings
+│   │   ├── schemas/             # Pydantic v2 models
+│   │   ├── services/            # Business logic (recommender, TMDB)
+│   │   └── main.py              # App factory + lifespan
+│   ├── Dockerfile               # Multi-stage Python build
+│   └── requirements.txt         # Pinned dependencies
+│
+├── movies.pkl                   # Pre-computed movie database (4,806 movies)
+├── similarity.pkl               # Cosine similarity matrix
+├── movierec.py                  # Original Streamlit app (preserved)
+├── docker-compose.yml           # Full-stack orchestration
+├── DEPLOYMENT.md                # AWS deployment guide
+└── README.md                    # This file
+```
+
 ---
-## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details (if applicable).
-## 🤝 Contributing
-Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/Artasam/Movie-Recommender-System/issues).
+
+## Prerequisites
+
+- **Node.js** 22+ (LTS) — [Download](https://nodejs.org)
+- **Python** 3.11+ — [Download](https://python.org)
+- **Git** — [Download](https://git-scm.com)
+- **Docker** (optional) — [Download](https://docker.com)
+- **TMDB API Key** (free) — [Get one here](https://www.themoviedb.org/settings/api)
+
 ---
-*Made with ❤️ by Artasam*
+
+## Quick Start (Local)
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Artasam/Movie-Recommender-System.git
+cd Movie-Recommender-System
+```
+
+### 2. Start the Backend
+
+```bash
+cd backend
+
+# Create virtual environment
+python -m venv venv
+
+# Activate it
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Create .env file
+cp .env.example .env
+# Edit .env and add your TMDB_API_KEY
+
+# Start the server
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+The API is now running at `http://localhost:8000`. Visit `http://localhost:8000/docs` for interactive API docs.
+
+### 3. Start the Frontend
+
+```bash
+# In a new terminal
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+```
+
+The app is now running at `http://localhost:5173`. The Vite dev server automatically proxies API requests to the backend.
+
+---
+
+## Environment Variables
+
+### Backend (`backend/.env`)
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `TMDB_API_KEY` | Yes | — | TMDB API key for poster fetching |
+| `CORS_ORIGINS` | No | `["http://localhost:5173"]` | Allowed CORS origins (JSON array) |
+| `DATA_DIR` | No | `../` (project root) | Path to pickle files directory |
+| `DEBUG` | No | `false` | Enable detailed error responses |
+| `HOST` | No | `0.0.0.0` | Server bind host |
+| `PORT` | No | `8000` | Server bind port |
+
+### Frontend (`frontend/.env`)
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `VITE_API_BASE_URL` | No | `http://localhost:8000` | Backend API URL (production only) |
+
+---
+
+## API Documentation
+
+### Base URL: `http://localhost:8000`
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Health check |
+| `GET` | `/api/v1/movies?page=1&limit=20` | List movies (paginated) |
+| `GET` | `/api/v1/movies/search?q=avatar&limit=10` | Search by title |
+| `GET` | `/api/v1/movies/{movie_id}` | Get movie by TMDB ID |
+| `GET` | `/api/v1/movies/{movie_id}/poster` | Get poster URL |
+| `POST` | `/api/v1/recommend` | Get recommendations |
+
+### Example: Get Recommendations
+
+```bash
+curl -X POST http://localhost:8000/api/v1/recommend \
+  -H "Content-Type: application/json" \
+  -d '{"movie_title": "Avatar", "count": 5}'
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "source_movie": {"movie_id": 19995, "title": "Avatar"},
+    "recommendations": [
+      {
+        "movie_id": 76338,
+        "title": "Thor: The Dark World",
+        "poster_url": "https://image.tmdb.org/t/p/w500/...",
+        "similarity_score": 0.2432
+      }
+    ]
+  },
+  "message": "Found 5 recommendations for 'Avatar'",
+  "errors": null
+}
+```
+
+Interactive docs available at:
+- **Swagger UI:** `http://localhost:8000/docs`
+- **ReDoc:** `http://localhost:8000/redoc`
+
+---
+
+## Docker Setup
+
+### Quick Start with Docker Compose
+
+```bash
+# Set your TMDB API key
+export TMDB_API_KEY=your_key_here
+
+# Build and start all services
+docker-compose up --build
+
+# Access the app at http://localhost
+# API docs at http://localhost/docs
+```
+
+### Individual Services
+
+```bash
+# Build and run backend only
+cd backend
+docker build -t cinematch-api .
+docker run -p 8000:8000 -e TMDB_API_KEY=your_key -v ../movies.pkl:/data/movies.pkl:ro -v ../similarity.pkl:/data/similarity.pkl:ro cinematch-api
+
+# Build and run frontend only
+cd frontend
+docker build -t cinematch-ui .
+docker run -p 80:80 cinematch-ui
+```
+
+---
+
+## Testing
+
+### Backend
+
+```bash
+cd backend
+source venv/bin/activate
+
+# Health check
+curl http://localhost:8000/health
+
+# Search
+curl "http://localhost:8000/api/v1/movies/search?q=batman"
+
+# Recommendations
+curl -X POST http://localhost:8000/api/v1/recommend \
+  -H "Content-Type: application/json" \
+  -d '{"movie_title": "The Dark Knight", "count": 5}'
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm run build    # TypeScript compilation check
+npm run dev      # Visual verification
+```
+
+---
+
+## Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete AWS deployment guide covering:
+
+1. S3 + CloudFront (frontend)
+2. EC2 t3.micro (backend)
+3. GitHub Actions CI/CD
+4. SSL/HTTPS setup
+5. Cost estimation (Free Tier)
+
+---
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+*Built with ❤️ by Artasam — Powered by Machine Learning*

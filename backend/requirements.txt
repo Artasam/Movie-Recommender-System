@@ -1,0 +1,12 @@
+# ── Movie Recommender API — Python Dependencies ─────────────────
+# Install: pip install -r requirements.txt
+
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-dotenv
+httpx
+pandas
+numpy
+gunicorn
