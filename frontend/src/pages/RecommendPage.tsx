@@ -57,11 +57,17 @@ export function RecommendPage() {
           `Found ${data.recommendations.length} recommendations!`,
           { icon: '🎬' }
         );
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Failed to get recommendations';
+      } catch (err: any) {
+        let message = 'Failed to get recommendations';
+        if (err?.response?.status === 404) {
+          message = `Movie "${title}" not found in our database.`;
+        } else if (err?.response?.data?.detail) {
+          message = err.response.data.detail;
+        } else if (err instanceof Error) {
+          message = err.message;
+        }
         setError(message);
-        toast.error(message);
+        toast.error(message, { icon: '🍿' });
       } finally {
         setIsLoading(false);
       }
@@ -165,20 +171,7 @@ export function RecommendPage() {
             </div>
           )}
 
-          {/* Error State */}
-          {error && !isLoading && (
-            <div className="error-state">
-              <AlertCircle size={48} className="error-state-icon" />
-              <h3 className="error-state-title">Something went wrong</h3>
-              <p className="error-state-message">{error}</p>
-              <button
-                className="btn btn-secondary"
-                onClick={() => searchQuery && fetchRecommendations(searchQuery, count)}
-              >
-                Try Again
-              </button>
-            </div>
-          )}
+
 
           {/* Success State */}
           {result && !isLoading && (
@@ -224,14 +217,16 @@ export function RecommendPage() {
             </>
           )}
 
-          {/* Empty State (no search yet) */}
-          {!result && !isLoading && !error && (
+          {/* Empty / Error State */}
+          {!result && !isLoading && (
             <div className="empty-state">
-              <Popcorn size={56} className="empty-state-icon" />
-              <h3 className="empty-state-title">Ready to explore?</h3>
+              <Popcorn size={56} className="empty-state-icon" style={{ opacity: error ? 0.8 : 0.4 }} />
+              <h3 className="empty-state-title">{error ? 'No Results Found' : 'Ready to explore?'}</h3>
               <p className="empty-state-message">
-                Search for a movie above and we'll find similar titles you'll
-                love. Try "Avatar", "The Dark Knight", or "Inception"!
+                {error 
+                  ? 'We couldn\'t find a match for that title. Try searching for a different movie!'
+                  : 'Search for a movie above and we\'ll find similar titles you\'ll love. Try "Avatar", "The Dark Knight", or "Inception"!'
+                }
               </p>
             </div>
           )}
