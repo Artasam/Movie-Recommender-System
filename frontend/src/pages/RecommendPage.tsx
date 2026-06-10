@@ -61,16 +61,25 @@ export function RecommendPage() {
         let message = 'Failed to get recommendations';
         if (err.response?.data?.detail) {
           message = err.response.data.detail;
-        } else if (err.response?.data?.message) {
-          message = err.response.data.message;
         } else if (err instanceof Error) {
-          // Fallback to generic message but avoid ugly status codes if possible
+          // Fallback but avoid showing ugly "Request failed with status code 404"
           message = err.message.includes('status code 404') 
-            ? `Movie '${title}' not found in our database.` 
+            ? 'Movie not found in database.' 
             : err.message;
         }
-        setError(message);
-        toast.error(message);
+        
+        toast.error(message, {
+          icon: '⚠️',
+          style: {
+            background: 'var(--color-bg-elevated)',
+            color: 'var(--color-text-primary)',
+            border: '1px solid var(--color-error)',
+            padding: '16px',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: 'var(--shadow-xl)',
+            fontSize: 'var(--text-sm)',
+          },
+        });
       } finally {
         setIsLoading(false);
       }
