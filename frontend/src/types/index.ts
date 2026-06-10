@@ -12,6 +12,7 @@ export interface ApiResponse<T> {
 export interface Movie {
   movie_id: number;
   title: string;
+  poster_url?: string | null;
 }
 
 /** Search result container with total count. */
@@ -22,7 +23,6 @@ export interface MovieSearchResult {
 
 /** A recommended movie with similarity score and optional poster. */
 export interface RecommendedMovie extends Movie {
-  poster_url: string | null;
   similarity_score: number;
 }
 

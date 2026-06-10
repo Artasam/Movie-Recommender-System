@@ -46,12 +46,14 @@ async def get_recommendations(
         )
 
     # Fetch all poster URLs concurrently (non-blocking)
-    poster_tasks = [
+    poster_tasks = [tmdb_service.fetch_poster_url(source_movie.movie_id)] + [
         tmdb_service.fetch_poster_url(rec.movie_id) for rec in recommendations
     ]
     posters = await asyncio.gather(*poster_tasks)
 
-    for rec, poster_url in zip(recommendations, posters):
+    source_movie.poster_url = posters[0]
+
+    for rec, poster_url in zip(recommendations, posters[1:]):
         rec.poster_url = poster_url
 
     return ApiResponse(

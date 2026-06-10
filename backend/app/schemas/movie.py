@@ -8,6 +8,7 @@ class MovieBase(BaseModel):
 
     movie_id: int
     title: str
+    poster_url: str | None = None
 
 
 class MovieSearchResult(BaseModel):
@@ -36,7 +37,6 @@ class RecommendRequest(BaseModel):
 class RecommendedMovie(MovieBase):
     """A recommended movie with similarity score and poster URL."""
 
-    poster_url: str | None = None
     similarity_score: float = Field(
         default=0.0,
         description="Cosine similarity score (0-1, higher = more similar)",

@@ -2,12 +2,13 @@
 
 > Discover your next favorite movie with AI-powered content-based recommendations from 4,800+ titles.
 
+**🌍 Live Demo:** [https://cinematch-eight-lime.vercel.app](https://cinematch-eight-lime.vercel.app)
+
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
-![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6-646CFF?logo=vite&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
@@ -22,7 +23,7 @@
 - [Quick Start (Local)](#quick-start-local)
 - [Environment Variables](#environment-variables)
 - [API Documentation](#api-documentation)
-- [Docker Setup](#docker-setup)
+- [Docker Setup (Backend)](#docker-setup-backend)
 - [Testing](#testing)
 - [Deployment](#deployment)
 - [Contributing](#contributing)
@@ -51,7 +52,6 @@ CineMatch is a full-stack movie recommendation system that uses **content-based 
 - 📱 **Fully Responsive** — Mobile-first design, 320px → 1920px
 - ♿ **Accessible** — WCAG 2.1 AA compliant, keyboard navigation, ARIA labels
 - ⚡ **Fast** — Code-split routes, lazy-loaded images, pre-computed similarity matrix
-- 🐳 **Dockerized** — One-command deployment with Docker Compose
 - 📖 **API Docs** — Interactive Swagger/ReDoc at `/docs` and `/redoc`
 
 ---
@@ -61,8 +61,8 @@ CineMatch is a full-stack movie recommendation system that uses **content-based 
 ### Frontend
 | Technology | Purpose |
 |-----------|---------|
-| React 18 + TypeScript | UI framework with strict type safety |
-| Vite 6 | Build tool and dev server |
+| React 19 + TypeScript | UI framework with strict type safety |
+| Vite 8 | Build tool and dev server |
 | Vanilla CSS | Custom design system with CSS variables |
 | React Router v6 | Client-side routing |
 | TanStack Query v5 | Server state management and caching |
@@ -85,16 +85,15 @@ CineMatch is a full-stack movie recommendation system that uses **content-based 
 ### Infrastructure
 | Technology | Purpose |
 |-----------|---------|
-| Docker + Docker Compose | Containerization |
-| Nginx | Frontend serving + API reverse proxy |
-| AWS (S3, CloudFront, EC2) | Cloud deployment |
-| GitHub Actions | CI/CD pipelines |
+| Vercel | Frontend deployment and proxying |
+| AWS EC2 | Backend hosting |
+| Docker | Backend containerization |
 
 ---
 
 ## Project Structure
 
-```
+```text
 Movie-Recommender-System/
 ├── frontend/                    # React + Vite + TypeScript
 │   ├── src/
@@ -107,8 +106,7 @@ Movie-Recommender-System/
 │   │   ├── hooks/               # Custom React hooks
 │   │   ├── App.tsx              # Root component + routing
 │   │   └── main.tsx             # Entry point
-│   ├── Dockerfile               # Multi-stage build (Node → Nginx)
-│   └── nginx.conf               # SPA routing + API proxy
+│   └── vercel.json              # Vercel configuration for API proxy and rewrites
 │
 ├── backend/                     # FastAPI
 │   ├── app/
@@ -123,8 +121,7 @@ Movie-Recommender-System/
 ├── movies.pkl                   # Pre-computed movie database (4,806 movies)
 ├── similarity.pkl               # Cosine similarity matrix
 ├── movierec.py                  # Original Streamlit app (preserved)
-├── docker-compose.yml           # Full-stack orchestration
-├── DEPLOYMENT.md                # AWS deployment guide
+├── docker-compose.yml           # Backend orchestration
 └── README.md                    # This file
 ```
 
@@ -135,7 +132,7 @@ Movie-Recommender-System/
 - **Node.js** 22+ (LTS) — [Download](https://nodejs.org)
 - **Python** 3.11+ — [Download](https://python.org)
 - **Git** — [Download](https://git-scm.com)
-- **Docker** (optional) — [Download](https://docker.com)
+- **Docker** (optional, for backend) — [Download](https://docker.com)
 - **TMDB API Key** (free) — [Get one here](https://www.themoviedb.org/settings/api)
 
 ---
@@ -210,7 +207,7 @@ The app is now running at `http://localhost:5173`. The Vite dev server automatic
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `VITE_API_BASE_URL` | No | `http://localhost:8000` | Backend API URL (production only) |
+| `VITE_API_BASE_URL` | No | `/api/v1` | Backend API URL (handled by proxies in dev/prod) |
 
 ---
 
@@ -262,7 +259,9 @@ Interactive docs available at:
 
 ---
 
-## Docker Setup
+## Docker Setup (Backend)
+
+The project includes a `docker-compose.yml` for easily running the FastAPI backend locally or on a server.
 
 ### Quick Start with Docker Compose
 
@@ -270,25 +269,20 @@ Interactive docs available at:
 # Set your TMDB API key
 export TMDB_API_KEY=your_key_here
 
-# Build and start all services
+# Build and start the backend service
 docker-compose up --build
 
-# Access the app at http://localhost
-# API docs at http://localhost/docs
+# Access the API at http://localhost:8000
+# API docs at http://localhost:8000/docs
 ```
 
-### Individual Services
+### Build Individual Container
 
 ```bash
 # Build and run backend only
 cd backend
 docker build -t cinematch-api .
 docker run -p 8000:8000 -e TMDB_API_KEY=your_key -v ../movies.pkl:/data/movies.pkl:ro -v ../similarity.pkl:/data/similarity.pkl:ro cinematch-api
-
-# Build and run frontend only
-cd frontend
-docker build -t cinematch-ui .
-docker run -p 80:80 cinematch-ui
 ```
 
 ---
@@ -325,13 +319,15 @@ npm run dev      # Visual verification
 
 ## Deployment
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete AWS deployment guide covering:
+The application utilizes a distributed deployment architecture for optimal performance:
 
-1. S3 + CloudFront (frontend)
-2. EC2 t3.micro (backend)
-3. GitHub Actions CI/CD
-4. SSL/HTTPS setup
-5. Cost estimation (Free Tier)
+1. **Frontend (Vercel)**
+   - Deployed on [Vercel](https://vercel.com/) for fast global edge delivery.
+   - **Live URL:** [https://cinematch-eight-lime.vercel.app](https://cinematch-eight-lime.vercel.app)
+   - API requests are proxied seamlessly to the backend using `vercel.json` rewrites.
+2. **Backend (AWS EC2)**
+   - Hosted on an AWS EC2 instance.
+   - The FastAPI backend handles recommendation calculations using the pre-computed `similarity.pkl` and `movies.pkl` datasets.
 
 ---
 

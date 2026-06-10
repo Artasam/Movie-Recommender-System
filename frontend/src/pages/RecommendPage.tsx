@@ -180,10 +180,10 @@ export function RecommendPage() {
             <>
               {/* Source Movie Card */}
               <div className="source-movie">
-                {result.recommendations[0]?.poster_url && (
+                {result.source_movie.poster_url && (
                   <img
                     className="source-movie-poster"
-                    src={result.recommendations[0].poster_url}
+                    src={result.source_movie.poster_url}
                     alt=""
                     aria-hidden="true"
                   />
