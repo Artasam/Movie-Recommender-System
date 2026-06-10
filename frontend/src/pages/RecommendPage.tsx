@@ -59,15 +59,18 @@ export function RecommendPage() {
         );
       } catch (err: any) {
         let message = 'Failed to get recommendations';
-        if (err?.response?.status === 404) {
-          message = `Movie "${title}" not found in our database.`;
-        } else if (err?.response?.data?.detail) {
+        if (err.response?.data?.detail) {
           message = err.response.data.detail;
+        } else if (err.response?.data?.message) {
+          message = err.response.data.message;
         } else if (err instanceof Error) {
-          message = err.message;
+          // Fallback to generic message but avoid ugly status codes if possible
+          message = err.message.includes('status code 404') 
+            ? `Movie '${title}' not found in our database.` 
+            : err.message;
         }
         setError(message);
-        toast.error(message, { icon: '🍿' });
+        toast.error(message);
       } finally {
         setIsLoading(false);
       }
@@ -171,7 +174,20 @@ export function RecommendPage() {
             </div>
           )}
 
-
+          {/* Error State */}
+          {error && !isLoading && (
+            <div className="error-state">
+              <AlertCircle size={48} className="error-state-icon" />
+              <h3 className="error-state-title">Something went wrong</h3>
+              <p className="error-state-message">{error}</p>
+              <button
+                className="btn btn-secondary"
+                onClick={() => searchQuery && fetchRecommendations(searchQuery, count)}
+              >
+                Try Again
+              </button>
+            </div>
+          )}
 
           {/* Success State */}
           {result && !isLoading && (
@@ -217,16 +233,14 @@ export function RecommendPage() {
             </>
           )}
 
-          {/* Empty / Error State */}
-          {!result && !isLoading && (
+          {/* Empty State (no search yet) */}
+          {!result && !isLoading && !error && (
             <div className="empty-state">
-              <Popcorn size={56} className="empty-state-icon" style={{ opacity: error ? 0.8 : 0.4 }} />
-              <h3 className="empty-state-title">{error ? 'No Results Found' : 'Ready to explore?'}</h3>
+              <Popcorn size={56} className="empty-state-icon" />
+              <h3 className="empty-state-title">Ready to explore?</h3>
               <p className="empty-state-message">
-                {error 
-                  ? 'We couldn\'t find a match for that title. Try searching for a different movie!'
-                  : 'Search for a movie above and we\'ll find similar titles you\'ll love. Try "Avatar", "The Dark Knight", or "Inception"!'
-                }
+                Search for a movie above and we'll find similar titles you'll
+                love. Try "Avatar", "The Dark Knight", or "Inception"!
               </p>
             </div>
           )}
