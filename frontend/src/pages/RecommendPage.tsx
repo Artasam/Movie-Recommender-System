@@ -22,6 +22,7 @@ import toast from 'react-hot-toast';
 export function RecommendPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [count, setCount] = useState(5);
   const [result, setResult] = useState<RecommendResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +33,7 @@ export function RecommendPage() {
     const movieParam = searchParams.get('movie');
     if (movieParam && !selectedMovie) {
       setSelectedMovie({ movie_id: 0, title: movieParam });
+      setSearchQuery(movieParam);
       // Auto-trigger recommendation
       fetchRecommendations(movieParam, count);
     }
@@ -69,6 +71,7 @@ export function RecommendPage() {
 
   const handleMovieSelect = (movie: Movie) => {
     setSelectedMovie(movie);
+    setSearchQuery(movie.title);
     setSearchParams({ movie: movie.title });
     fetchRecommendations(movie.title, count);
   };
@@ -78,12 +81,12 @@ export function RecommendPage() {
   };
 
   const handleRecommend = () => {
-    if (!selectedMovie) {
-      toast.error('Please select a movie first');
+    if (!searchQuery.trim()) {
+      toast.error('Please enter a movie title');
       return;
     }
-    setSearchParams({ movie: selectedMovie.title });
-    fetchRecommendations(selectedMovie.title, count);
+    setSearchParams({ movie: searchQuery });
+    fetchRecommendations(searchQuery, count);
   };
 
   return (
@@ -103,6 +106,8 @@ export function RecommendPage() {
         {/* ── Controls ─────────────────────────────────────── */}
         <div className="recommend-controls">
           <SearchBar
+            initialQuery={searchQuery}
+            onQueryChange={setSearchQuery}
             onSelect={handleMovieSelect}
             placeholder="Type a movie title..."
           />
@@ -136,7 +141,7 @@ export function RecommendPage() {
             <button
               className="btn btn-primary btn-lg"
               onClick={handleRecommend}
-              disabled={!selectedMovie || isLoading}
+              disabled={!searchQuery.trim() || isLoading}
               id="recommend-button"
             >
               {isLoading ? (
@@ -168,7 +173,7 @@ export function RecommendPage() {
               <p className="error-state-message">{error}</p>
               <button
                 className="btn btn-secondary"
-                onClick={() => selectedMovie && fetchRecommendations(selectedMovie.title, count)}
+                onClick={() => searchQuery && fetchRecommendations(searchQuery, count)}
               >
                 Try Again
               </button>

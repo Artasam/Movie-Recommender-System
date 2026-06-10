@@ -11,6 +11,8 @@ import type { Movie } from '../types';
 
 interface SearchBarProps {
   onSelect: (movie: Movie) => void;
+  onQueryChange?: (query: string) => void;
+  initialQuery?: string;
   placeholder?: string;
   /** Optional: auto-focus the input on mount */
   autoFocus?: boolean;
@@ -18,10 +20,23 @@ interface SearchBarProps {
 
 export function SearchBar({
   onSelect,
+  onQueryChange,
+  initialQuery = '',
   placeholder = 'Search 4,800+ movies...',
   autoFocus = false,
 }: SearchBarProps) {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery);
+
+  useEffect(() => {
+    if (initialQuery) {
+      setQuery(initialQuery);
+    }
+  }, [initialQuery]);
+
+  const handleQueryChange = (val: string) => {
+    setQuery(val);
+    onQueryChange?.(val);
+  };
   const [results, setResults] = useState<Movie[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,7 +92,7 @@ export function SearchBar({
 
   const handleSelect = useCallback(
     (movie: Movie) => {
-      setQuery(movie.title);
+      handleQueryChange(movie.title);
       setIsOpen(false);
       setResults([]);
       onSelect(movie);
@@ -86,7 +101,7 @@ export function SearchBar({
   );
 
   const handleClear = () => {
-    setQuery('');
+    handleQueryChange('');
     setResults([]);
     setIsOpen(false);
     inputRef.current?.focus();
@@ -132,7 +147,7 @@ export function SearchBar({
           type="text"
           className="search-input"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => handleQueryChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onFocus={() => results.length > 0 && setIsOpen(true)}
           placeholder={placeholder}
